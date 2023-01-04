@@ -33,12 +33,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Check if the player wants to jump, we need to do this in Update since GetKeyDown can be missed in fixed update.
+        // Check if the player wants to jump, we need to do this in Update since GetKeyDown can be missed in FixedUpdate.
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
             jumping = true;
 
 #if UNITY_EDITOR
-        //Jetpack cheat fill fuel (testing)
+        //Jetpack cheat, fill fuel tank (just for testing)
         if (Input.GetKeyDown(KeyCode.K))
             currentFuel = maxFuel;
 #endif
@@ -46,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(gameEnded)
+        if(gameEnded) // Avoid movement when game finished.
             return;
 
         if (jumping)
