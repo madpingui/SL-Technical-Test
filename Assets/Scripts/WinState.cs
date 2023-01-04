@@ -5,12 +5,11 @@ using UnityEngine.SceneManagement;
 public class WinState : MonoBehaviour
 {
     public static Action WinEvent;
-
     public GameObject endPanel;
 
     private bool gameEnded = false;
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
@@ -21,7 +20,7 @@ public class WinState : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
         // If game ended then press R to reload the game.
         if (Input.GetKeyDown(KeyCode.R) && gameEnded)

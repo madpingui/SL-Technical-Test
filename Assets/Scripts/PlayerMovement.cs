@@ -17,31 +17,46 @@ public class PlayerMovement : MonoBehaviour
     
     private Rigidbody rigidbody;
     private Camera camera;
+
     private float groundCheckDistance = 0.5f;
     private bool gameEnded = false;
+    private bool jumping = false;
 
     void Start()
     {
-        currentFuel = maxFuel; // Begin with jetpack tank filled;
-        rigidbody = GetComponent<Rigidbody>();
-        camera = Camera.main; // Expensive search but once it's fine.
+        currentFuel = maxFuel;     // Begin with jetpack tank filled;
+        rigidbody   = GetComponent<Rigidbody>();
+        camera      = Camera.main; // Expensive search but once it's fine.
 
         WinState.WinEvent += () => gameEnded = true;
     }
 
     void Update()
     {
+        // Check if the player wants to jump, we need to do this in Update since GetKeyDown can be missed in fixed update.
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+            jumping = true;
+
+#if UNITY_EDITOR
+        //Jetpack cheat fill fuel (testing)
+        if (Input.GetKeyDown(KeyCode.K))
+            currentFuel = maxFuel;
+#endif
+    }
+
+    void FixedUpdate()
+    {
         if(gameEnded)
             return;
 
+        if (jumping)
+            Jump();
         Movement();
-        Jump();
         Jetpack();
 
         CheckValidPlayerPosition();
     }
 
-    // All logic for player movement
     void Movement()
     {
         // Works both with WASD and arrow keys.
@@ -59,12 +74,10 @@ public class PlayerMovement : MonoBehaviour
         rigidbody.AddForce(direction * speed);
     }
 
-    
     void Jump()
     {
-        // Check if the player wants to jump.
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
-            rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse); // Apply one time force up.
+        jumping = false;
     }
 
     void Jetpack()
@@ -88,9 +101,6 @@ public class PlayerMovement : MonoBehaviour
     {
         // Prevention if player went underground.
         if (transform.position.y < -10)
-        {
-            // Reset player position
-            transform.position = Vector3.up;
-        }
+            transform.position = Vector3.up; // Reset player position
     }
 }
